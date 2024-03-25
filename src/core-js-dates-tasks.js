@@ -269,8 +269,39 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const startDate = new Date(period.start);
+  const finalDate = period.end;
+  const changedFormatDate = finalDate.split('-');
+  const formatted = [
+    changedFormatDate[1],
+    changedFormatDate[0],
+    changedFormatDate[2],
+  ].join('-');
+  const endDate = new Date(formatted);
+  const schedule = [];
+  let workDaysCounter = 1;
+  let daysOffCounter = 1;
+  while (startDate <= endDate) {
+    if (workDaysCounter < countWorkDays && workDaysCounter !== 0) {
+      schedule.push(
+        `${startDate.getDate().toString().padStart(2, '0')}-${(Number(startDate.getMonth()) + 1).toString().padStart(2, '0')}-${startDate.getFullYear()}`
+      );
+      workDaysCounter += 1;
+    } else if (workDaysCounter === countWorkDays && workDaysCounter !== 0) {
+      schedule.push(
+        `${startDate.getDate().toString().padStart(2, '0')}-${(Number(startDate.getMonth()) + 1).toString().padStart(2, '0')}-${startDate.getFullYear()}`
+      );
+      workDaysCounter = 0;
+    } else if (workDaysCounter === 0 && daysOffCounter < countOffDays) {
+      daysOffCounter += 1;
+    } else {
+      daysOffCounter = 1;
+      workDaysCounter = 1;
+    }
+    startDate.setDate(startDate.getDate() + 1);
+  }
+  return schedule;
 }
 
 /**
@@ -285,8 +316,9 @@ function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
  * Date(2022, 2, 1) => false
  * Date(2020, 2, 1) => true
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  const year = date.getFullYear();
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
 module.exports = {
